@@ -8,7 +8,7 @@
       <div class="table-responsive">
         <table class="table table-striped text-center table-bordered">
           <thead>
-            <tr>
+            <tr class="align-middle">
               <th>No.</th>
               <th>Nama</th>
               <th>NIM</th>
@@ -41,7 +41,13 @@
                     class="btn btn-primary"
                     ><i class="bi bi-plus-lg"></i>
                   </router-link>
-                  <button type="button" @click="HandleDeleteData(data.id)" class="btn btn-danger">
+                  <button
+                    type="button"
+                    data-bs-toggle="modal"
+                    data-bs-target="#deleteConfirmationModal"
+                    @click="HandleDeleteData(data.id)"
+                    class="btn btn-danger"
+                  >
                     <i class="bi bi-trash-fill"></i>
                   </button>
                 </div>
@@ -51,33 +57,74 @@
         </table>
       </div>
     </div>
+
+    <!-- Modal -->
+    <div
+      class="modal fade"
+      id="deleteConfirmationModal"
+      tabindex="-1"
+      aria-labelledby="deleteConfirmationModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="deleteConfirmationModalLabel">Konfirmasi</h5>
+            <button type="button" class="btn-close" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">Apakah kamu yakin ingin menghapus semua mata kuliah terdaftar pada data ini?</div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+            <button
+              type="button"
+              class="btn btn-danger"
+              data-bs-dismiss="modal"
+              @click="confirmDelete"
+            >
+              Hapus
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
 import { ref, onMounted } from 'vue'
 import { getAllAssigned, deleteAssigned } from '../../services/assigned-matkul-api.js'
+import { useToast } from 'vue-toastification'
 
 export default {
   name: 'AkademikPage',
   setup() {
     const dataAkademik = ref([])
+    const toast = useToast()
+    const deletingItemId = ref(null)
 
     const fetchData = async () => {
       try {
         const data = await getAllAssigned()
         dataAkademik.value = data
       } catch (error) {
-        console.log(error)
+        console.error('error', error)
+        toast.error('Failed to load data')
       }
     }
 
     const HandleDeleteData = async (id) => {
+      deletingItemId.value = id
+      document.getElementById('deleteConfirmationModal').classList.add('show')
+    }
+
+    const confirmDelete = async () => {
       try {
-        await deleteAssigned(id)
-        fetchData()
+        const data = await deleteAssigned(deletingItemId.value)
+        await fetchData()
+        toast.success(data)
       } catch (error) {
-        console.log(error)
+        console.error('error', error)
+        toast.error('Failed to delete data')
       }
     }
 
@@ -88,17 +135,20 @@ export default {
     return {
       dataAkademik,
       HandleDeleteData,
+      confirmDelete,
+
+
       enrolledSubjects(data) {
         return data.enrolled_subjects.map((subject) => subject.name).join(',<br>')
       },
       lecturersNames(data) {
         return data.enrolled_subjects
-          .map((subject) => (subject.lecturers && subject.lecturers.name) || '')
+          .map((subject) => (subject.lecturers && subject.lecturers.name) || 'N/A')
           .join(',<br>')
       },
       lecturersIds(data) {
         return data.enrolled_subjects
-          .map((subject) => (subject.lecturers && subject.lecturers.lecturers_id) || '')
+          .map((subject) => (subject.lecturers && subject.lecturers.lecturers_id) || 'N/A')
           .join(',<br>')
       }
     }

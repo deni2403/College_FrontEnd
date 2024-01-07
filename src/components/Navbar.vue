@@ -6,10 +6,10 @@ export default {
   data() {
     return {
       username: ''
-    };
+    }
   },
   mounted() {
-    this.getCurrentUser();
+    this.getCurrentUser()
   },
   methods: {
     logout() {
@@ -19,7 +19,11 @@ export default {
     async getCurrentUser() {
       try {
         const currentUser = await auth.getCurrentUser()
-        this.username = currentUser.name 
+        if (currentUser && currentUser.name) {
+          this.username = currentUser.name
+        } else {
+          this.username = ''
+        }
       } catch (error) {
         console.error('Error fetching current user:', error)
       }
@@ -40,7 +44,7 @@ export default {
         aria-expanded="false"
         aria-label="Toggle navigation"
       >
-        <span class="navbar-toggler-icon"></span>
+        <i class="bi bi-list"></i>
       </button>
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav">
@@ -61,7 +65,11 @@ export default {
         </ul>
         <div class="ms-auto user-info">
           <span class="username-info me-3">Welcome, {{ username }}</span>
-          <button type="button" @click="logout" class="btn btn-outline-danger text-white">
+          <button
+            type="button"
+            @click="logout"
+            class="logout-btn btn btn-outline-danger text-white"
+          >
             Logout
           </button>
         </div>

@@ -1,9 +1,9 @@
 <template>
   <div class="box-container">
     <div class="table-header">
-        <h3>Ambil Mata Kuliah</h3>
-        <hr class="divider" />
-      </div>
+      <h3>Ambil Mata Kuliah</h3>
+      <hr class="divider" />
+    </div>
     <form @submit.prevent="handleSubmit">
       <div class="mb-3">
         <label for="name" class="form-label">Nama Mahasiswa</label>
@@ -56,7 +56,7 @@ import { ref, onMounted, watchEffect } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { getAvailableMatkul, getById } from '../../services/mahasiswa-api.js'
 import { assignMatKul } from '../../services/assigned-matkul-api.js'
-import { getMatKulById } from '@/services/mataKuliah-api'
+import { useToast } from 'vue-toastification'
 
 export default {
   name: 'AkademikAdd',
@@ -78,12 +78,15 @@ export default {
       students_id: ''
     })
 
+    const toast = useToast()
+
     const fetchAvailableMatKul = async () => {
       try {
         const data = await getAvailableMatkul(id)
         availableMatkul.value = data
       } catch (error) {
-        console.log('error', error)
+        console.error('error', error)
+        toast.error('Failed to load data')
       }
     }
 
@@ -92,16 +95,20 @@ export default {
         const data = await getById(id)
         dataMhs.value = data
       } catch (error) {
-        console.log('error', error)
+        console.error('error', error)
+        toast.error('Failed to load mahasiswa data')
       }
     }
 
     const handleSubmit = async () => {
       try {
-        await assignMatKul(formData.value)
+        const data = await assignMatKul(formData.value)
+
+        toast.success(data.message)
         router.push({ name: 'RekapAkademikPage' })
       } catch (error) {
-        console.log(error)
+        console.error('error', error)
+        toast.error('Failed to add data')
       }
     }
 
@@ -111,19 +118,15 @@ export default {
     })
 
     watchEffect(() => {
-      const fetchData = async () => {
-        try {
-          const data = await getMatKulById(formData.value.subjects_id)
-          if (data.lecturers_id !== null && data.lecturers) {
-            selectedSubjectLecturer.value = data.lecturers.name || ''
-          } else {
-            selectedSubjectLecturer.value = ''
-          }
-        } catch (error) {
-          console.log('error', error)
-        }
+      const selectedMatkul = availableMatkul.value.find(
+        (matKul) => matKul.id === formData.value.subjects_id
+      )
+
+      if (selectedMatkul && selectedMatkul.lecturers) {
+        selectedSubjectLecturer.value = selectedMatkul.lecturers.name || ''
+      } else {
+        selectedSubjectLecturer.value = 'N/A'
       }
-      fetchData()
     })
 
     return {

@@ -5,10 +5,14 @@ const BASE_URL = import.meta.env.VITE_API_BASE_URL
 async function getAllDosen() {
   try {
     const response = await authorizedApiClient.get(`${BASE_URL}/api/lecturers`)
-    const responseData = response.data.data
-    return responseData
+    if (response.status == 200) {
+      const responseData = response.data.data
+      return responseData
+    } else {
+      throw new Error('Get dosen data failed')
+    }
   } catch (error) {
-    return error
+    return console.error(error)
   }
 }
 
@@ -18,20 +22,10 @@ async function getDosenById(id) {
     if (response.status == 200) {
       return response.data.data
     } else {
-      return response.data.error
+      return response.data.message
     }
   } catch (error) {
-    return error
-  }
-}
-
-async function getDosenWithoutMatKul() {
-  try {
-    const response = await authorizedApiClient.get(`${BASE_URL}/api/lecturers-without-subjects`)
-    const responseData = response.data.data
-    return responseData
-  } catch (error) {
-    return error
+    return console.error('Get data failed', error)
   }
 }
 
@@ -44,7 +38,7 @@ async function addDosen(data) {
       return { message: response.data.message }
     }
   } catch (error) {
-    return error
+    return console.error('Add dosen failed', error)
   }
 }
 
@@ -57,7 +51,7 @@ async function updateDosen(data) {
       return { message: response.data.message }
     }
   } catch (error) {
-    return error
+    return console.error('Update dosen failed', error)
   }
 }
 
@@ -70,7 +64,21 @@ async function deleteDosen(id) {
       return response.data.error
     }
   } catch (error) {
-    return error
+    return console.error('Delete dosen failed', error)
+  }
+}
+
+async function getDosenWithoutMatKul() {
+  try {
+    const response = await authorizedApiClient.get(`${BASE_URL}/api/lecturers-without-subjects`)
+    if (response.status == 200) {
+      const responseData = response.data.data
+      return responseData
+    } else {
+      throw new Error('Get dosen data failed')
+    }
+  } catch (error) {
+    return console.error(error)
   }
 }
 

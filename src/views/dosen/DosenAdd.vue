@@ -39,6 +39,7 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { addDosen } from '@/services/dosen-api'
+import { useToast } from "vue-toastification";
 
 export default {
   name: 'DosenAdd',
@@ -51,9 +52,11 @@ export default {
       gender: ''
     })
 
+    const toast = useToast()
+
     const handleSubmit = async () => {
       try {
-        await addDosen(formData.value)
+        const data = await addDosen(formData.value)
 
         formData.value = {
           name: '',
@@ -62,9 +65,11 @@ export default {
           gender: ''
         }
 
+        toast.success(data.message)
         router.push({ name: 'DosenPage' })
       } catch (error) {
-        console.log('error', error)
+        console.error('error', error)
+        toast.error("Failed to add Data")
       }
     }
 

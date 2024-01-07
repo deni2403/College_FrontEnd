@@ -15,6 +15,7 @@
               id="text"
               placeholder="Username"
               v-model="username"
+              autocomplete="off"
             />
           </div>
           <div class="mb-2 pass-container">
@@ -48,39 +49,54 @@
 
 <script>
 import auth from '../services/auth'
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+import { useToast } from 'vue-toastification'
 
 export default {
   name: 'LoginPage',
-  data() {
-    return {
-      showPassword: false,
-      username: '',
-      password: ''
-    }
-  },
-  methods: {
-    togglePassword() {
-      const passwordInput = this.$refs.passwordInput
-      this.showPassword = !this.showPassword
+  setup() {
+    const router = useRouter()
+    const showPassword = ref(false)
+    const username = ref('')
+    const password = ref('')
+    const passwordInput = ref(null)
+    const toast = useToast()
 
-      if (this.showPassword) {
-        passwordInput.type = 'text'
+    const togglePassword = () => {
+      showPassword.value = !showPassword.value
+
+      if (showPassword.value) {
+        passwordInput.value.type = 'text'
       } else {
-        passwordInput.type = 'password'
+        passwordInput.value.type = 'password'
       }
-    },
-    async login() {
+    }
+
+    const login = async () => {
       try {
         const credentials = {
-          username: this.username,
-          password: this.password
+          username: username.value,
+          password: password.value
         }
 
         await auth.login(credentials)
-        this.$router.push('/')
+        router.push('/')
       } catch (error) {
-        console.log('Login error', error)
+        console.error('Login error', error)
+        toast.error('username or password is incorrect', {
+          position: 'top-center'
+        })
       }
+    }
+
+    return {
+      showPassword,
+      username,
+      password,
+      passwordInput,
+      togglePassword,
+      login
     }
   }
 }

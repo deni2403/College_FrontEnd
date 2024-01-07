@@ -39,6 +39,8 @@
 import { ref } from 'vue'
 import { addMhs } from '@/services/mahasiswa-api'
 import { useRouter } from 'vue-router'
+import { useToast } from "vue-toastification";
+
 
 export default {
   name: 'MahasiswaAdd',
@@ -51,9 +53,11 @@ export default {
       gender: ''
     })
 
+    const toast = useToast()
+
     const handleSubmit = async () => {
       try {
-        await addMhs(formData.value)
+        const data = await addMhs(formData.value)
 
         formData.value = {
           name: '',
@@ -61,7 +65,7 @@ export default {
           major: '',
           gender: ''
         }
-        
+        toast.success(data.message)
         router.push({ name: 'MahasiswaPage' })
       } catch (error) {
         console.log(error)

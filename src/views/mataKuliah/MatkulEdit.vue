@@ -74,10 +74,11 @@
 </template>
 
 <script>
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted, watchEffect } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { getMatKulById, updateMatKul } from '@/services/mataKuliah-api'
 import { getDosenWithoutMatKul } from '@/services/dosen-api'
+import { useToast } from 'vue-toastification'
 
 export default {
   name: 'MataKuliahEdit',
@@ -90,11 +91,12 @@ export default {
       credits: '',
       lecturers_id: '',
       lecturers: {
-        name: '',
+        name: ''
       }
     })
-    
+
     const lecturersWithoutSubjects = ref([])
+    const toast = useToast()
 
     const fetchDataDosen = async () => {
       try {
@@ -102,10 +104,11 @@ export default {
         if (data) {
           lecturersWithoutSubjects.value = data
         } else {
-          console.log('error', data)
+          toast.error(data)
         }
       } catch (error) {
-        console.log('error', error)
+        console.error('error', error)
+        toast.error('Failed to load Dosen data')
       }
     }
 
@@ -116,19 +119,23 @@ export default {
         if (data) {
           Object.assign(dataMatKul.value, data)
         } else {
-          console.log('error', data)
+          toast.error(data)
         }
       } catch (error) {
-        console.log('error', error)
+        console.error('error', error)
+        toast.error('Failed to load data')
       }
     }
 
     const updateData = async () => {
       try {
-        await updateMatKul(dataMatKul.value)
+        const data = await updateMatKul(dataMatKul.value)
+
+        toast.success(data.message)
         router.push({ name: 'MataKuliahPage' })
       } catch (error) {
-        console.log(error)
+        console.error('error', error)
+        toast.error('Failed to update data')
       }
     }
 
@@ -137,13 +144,16 @@ export default {
       fetchDataDosen()
     })
 
-    watch(() => dataMatKul.lecturers_id, (newValue) => {
-      const selectedLecturer = lecturersWithoutSubjects.value.find(lecturer => lecturer.id === newValue);
+    watchEffect(() => {
+      const newValue = dataMatKul.lecturers_id
+      const selectedLecturer = lecturersWithoutSubjects.value.find(
+        (lecturer) => lecturer.id === newValue
+      )
 
       if (selectedLecturer) {
-        dataMatKul.lecturers_id = selectedLecturer;
+        dataMatKul.lecturers_id = selectedLecturer
       }
-    });
+    })
 
     return {
       dataMatKul,

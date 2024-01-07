@@ -39,6 +39,7 @@
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { getDosenById, updateDosen } from '@/services/dosen-api'
+import { useToast } from "vue-toastification";
 
 export default {
   name: 'DosenEdit',
@@ -52,6 +53,8 @@ export default {
       gender: ''
     })
 
+    const toast = useToast()
+
     const fetchData = async () => {
       try {
         const id = route.params.id
@@ -60,19 +63,23 @@ export default {
         if (data) {
           Object.assign(dataDosen.value, data)
         } else {
-          console.log('error', data)
+          toast.error(data)
         }
       } catch (error) {
-        console.log('error', error)
+        console.error('error', error)
+        toast.error("Failed to load Data")
       }
     }
 
     const updateData = async () => {
       try {
-        await updateDosen(dataDosen.value)
+        const data = await updateDosen(dataDosen.value)
+
+        toast.success(data.message)
         router.push({ name: 'DosenPage' })
       } catch (error) {
-        console.log(error)
+        console.error(error)
+        toast.error("Failed to update Data")
       }
     }
 

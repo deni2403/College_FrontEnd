@@ -5,10 +5,14 @@ const BASE_URL = import.meta.env.VITE_API_BASE_URL
 async function getAllMatKul() {
   try {
     const response = await authorizedApiClient.get(`${BASE_URL}/api/subjects`)
-    const responseData = response.data.data
-    return responseData
+    if (response.status == 200) {
+      const responseData = response.data.data
+      return responseData
+    } else {
+      throw new Error('Get mata kuliah data failed')
+    }
   } catch (error) {
-    return error
+    return console.error(error)
   }
 }
 
@@ -18,23 +22,23 @@ async function getMatKulById(id) {
     if (response.status == 200) {
       return response.data.data
     } else {
-      return response.data.error
+      return response.data.message
     }
   } catch (error) {
-    return error
+    return console.error('Get data failed', error)
   }
 }
 
 async function addMatKul(data) {
   try {
     const response = await authorizedApiClient.post(`${BASE_URL}/api/subjects`, data)
-    if (response.status == 200) {
+    if (response.status == 201) {
       return { data: response.data.data, message: response.data.message }
     } else {
       return { message: response.data.message }
     }
   } catch (error) {
-    return error
+    return console.error('Add mata kuliah failed', error)
   }
 }
 
@@ -47,7 +51,7 @@ async function updateMatKul(data) {
       return { message: response.data.message }
     }
   } catch (error) {
-    return error
+    return console.error('Update mata kuliah failed', error)
   }
 }
 
@@ -60,7 +64,7 @@ async function deleteMatKul(id) {
       return response.data.error
     }
   } catch (error) {
-    return error
+    return console.error(error)
   }
 }
 

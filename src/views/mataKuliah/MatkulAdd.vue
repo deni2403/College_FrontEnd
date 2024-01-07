@@ -47,10 +47,11 @@
 </template>
 
 <script>
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted, watchEffect } from 'vue'
 import { addMatKul } from '@/services/mataKuliah-api'
 import { useRouter } from 'vue-router'
 import { getDosenWithoutMatKul } from '@/services/dosen-api'
+import { useToast } from 'vue-toastification'
 
 export default {
   name: 'MataKuliahAdd',
@@ -64,6 +65,7 @@ export default {
     })
 
     const lecturersWithoutSubjects = ref([])
+    const toast = useToast()
 
     const fetchDataDosen = async () => {
       try {
@@ -71,16 +73,17 @@ export default {
         if (data) {
           lecturersWithoutSubjects.value = data
         } else {
-          console.log('error', data)
+          toast.error(data)
         }
       } catch (error) {
-        console.log('error', error)
+        console.error('error', error)
+        toast.error('Failed to fetch data')
       }
     }
 
     const handleSubmit = async () => {
       try {
-        await addMatKul(formData.value)
+        const data = await addMatKul(formData.value)
 
         formData.value = {
           name: '',
@@ -89,9 +92,11 @@ export default {
           lecturers_id: ''
         }
 
+        toast.success(data.message)
         router.push({ name: 'MataKuliahPage' })
       } catch (error) {
-        console.log(error)
+        console.error('error', error)
+        toast.error('Failed to add data')
       }
     }
 
@@ -99,18 +104,16 @@ export default {
       fetchDataDosen()
     })
 
-    watch(
-      () => formData.lecturers_id,
-      (newValue) => {
-        const selectedLecturer = lecturersWithoutSubjects.value.find(
-          (lecturer) => lecturer.id === newValue
-        )
+    watchEffect(() => {
+      const newValue = formData.lecturers_id
+      const selectedLecturer = lecturersWithoutSubjects.value.find(
+        (lecturer) => lecturer.id === newValue
+      )
 
-        if (selectedLecturer) {
-          formData.lecturers_id = selectedLecturer
-        }
+      if (selectedLecturer) {
+        formData.lecturers_id = selectedLecturer
       }
-    )
+    })
 
     return {
       formData,

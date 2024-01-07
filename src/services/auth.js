@@ -1,37 +1,57 @@
-import authorizedApiClient from "./axios-instance"
+import authorizedApiClient from './axios-instance'
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL
 
 async function login(credentials) {
-  try {
     const response = await authorizedApiClient.post(`${BASE_URL}/api/users/login`, credentials)
-    const token = response.data.data.token
-    localStorage.setItem('token', token)
-    return token
-  } catch (error) {
-    return error
-  }
+    if (response.status == 200) {
+      const responseData = response.data.data
+      const token = responseData.token
+      localStorage.setItem('token', token)
+      return token
+    } else {
+      return response.data.errors.message
+    }
 }
 
 async function registerUser(credentials) {
   try {
     const response = await authorizedApiClient.post(`${BASE_URL}/api/users`, credentials)
-    return response.data.data
+    if (response == 201) {
+      const responseData = response.data.data
+      return responseData
+    } else {
+      throw new Error('Registration failed')
+    }
   } catch (error) {
-    return error
+    console.error(error)
   }
 }
 
 async function logout() {
-  localStorage.removeItem('token')
+  try {
+    const response = await authorizedApiClient.delete(`${BASE_URL}/api/users/logout`)
+    if (response.status == 200) {
+      localStorage.removeItem('token')
+    } else {
+      throw new Error('Logout failed')
+    }
+  } catch (error) {
+    console.error(error)
+  }
 }
 
 async function getCurrentUser() {
   try {
-    const response = await authorizedApiClient.get(`${BASE_URL}/api/users/current`);
-    return response.data.data;
+    const response = await authorizedApiClient.get(`${BASE_URL}/api/users/current`)
+    if (response.status == 200) {
+      const responseData = response.data.data
+      return responseData
+    } else {
+      throw new Error('Get current user failed')
+    }
   } catch (error) {
-    console.log(error)
+    return console.error(error)
   }
 }
 

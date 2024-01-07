@@ -39,6 +39,7 @@
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { getById, updateMhs } from '../../services/mahasiswa-api'
+import { useToast } from "vue-toastification";
 
 export default {
   name: 'MahasiswaEdit',
@@ -52,6 +53,8 @@ export default {
       gender: ''
     })
 
+    const toast = useToast()
+
     const fetchData = async () => {
       try {
         const id = route.params.id
@@ -60,19 +63,22 @@ export default {
         if (data) {
           Object.assign(dataMhs.value, data)
         } else {
-          console.log('error', data)
+          toast.error(data)
         }
       } catch (error) {
-        console.log('error', error)
+        console.error('error', error)
+        toast.error("Failed load Data");
       }
     }
 
     const updateData = async () => {
       try {
-        await updateMhs(dataMhs.value)
+        const data = await updateMhs(dataMhs.value)
+        toast.success(data.message)
         router.push({ name: 'MahasiswaPage' })
       } catch (error) {
-        console.log(error)
+        console.error('error', error)
+        toast.error("Failed update data");
       }
     }
 

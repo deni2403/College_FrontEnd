@@ -61,6 +61,7 @@
 import auth from '../services/auth'
 import { useRouter } from 'vue-router'
 import { ref } from 'vue'
+import { useToast } from 'vue-toastification'
 
 export default {
   name: 'RegisterPage',
@@ -73,13 +74,21 @@ export default {
     })
 
     const showPassword = ref(false)
+    const toast = useToast()
 
     const handleRegister = async () => {
       try {
         await auth.registerUser(data.value)
+
+        toast.success('Register Success', {
+          position: 'top-center'
+        })
         router.push('/login')
       } catch (error) {
-        console.log(error)
+        console.error('error', error)
+        toast.error('Failed to register', {
+          position: 'top-center'
+        })
       }
     }
 

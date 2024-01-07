@@ -28,9 +28,22 @@
     padding: 0.5rem 1rem;
 }
 
+.navbar-toggler{
+    border: 0;
+    background-color: transparent;
+    font-size: 30px;
+    color: var(--bg-white);
+    padding: 0;
+}
+
+.navbar-toggler:focus {
+    box-shadow: none;
+    outline: none;
+}
+
 .nav-link {
     color: var(--bg-white);
-    font-size: 1rem;
+    font-size: 14px;
     transition: all 0.3s linear;
 }
 
@@ -48,26 +61,47 @@
 
 .username-info {
     color: var(--bg-white);
-    font-size: 1rem;
+    font-size: 14px;
     font-weight: 500;
     transition: all 0.3s linear;
 }
 
+.logout-btn {
+    font-size: 14px;
+}
+
+.page-container{
+    padding: 1rem;
+}
+
 .box-container {
-    margin: 50px 100px;
+    margin: 30px 20px;
     background-color: var(--bg-white);
-    padding: 1.5rem;
+    padding: 1.2rem;
     border-radius: 10px;
+}
+
+.box-container .add-btn{
+    font-size: 14px;
+    font-weight: 600;
 }
 
 .table-header h3 {
     color: var(--primary-color);
-    font-size: 1.5rem;
+    font-size: 1.3rem;
     font-weight: 500;
 }
 
-.user-info{
-    flex-direction: column;
+table th {
+    font-size: 14px;
+}
+
+table td {
+    font-size: 12px;
+}
+
+table td .btn {
+    font-size: 10px;
 }
 
 
@@ -123,7 +157,7 @@
     margin: 35px 0;
 }
 
-.register-button-container{
+.register-button-container {
     margin: 35px 0;
 }
 
@@ -170,6 +204,19 @@
 
 
 @media (min-width: 768px) {
+
+    table th {
+        font-size: 16px;
+    }
+
+    table td {
+        font-size: 14px;
+    }
+
+    table td .btn {
+        font-size: 14px;
+    }
+
     .login-header {
         margin-top: 30px;
         margin-bottom: 20px;
@@ -213,6 +260,45 @@
 }
 
 @media (min-width: 992px) {
+    .nav-link {
+        font-size: 1rem;
+    }
+
+    .username-info {
+        font-size: 1rem;
+    }
+
+    .page-container{
+        padding: 0;
+    }
+    
+    .box-container {
+        margin: 50px 100px;
+        background-color: var(--bg-white);
+        padding: 1.5rem;
+        border-radius: 10px;
+    }
+
+    .box-container .add-btn{
+        font-size: 16px;
+    }
+
+    .table-header h3 {
+        font-size: 1.5rem;
+    }
+
+    table th {
+        font-size: 18px;
+    }
+
+    table td {
+        font-size: 16px;
+    }
+
+    table td .btn {
+        font-size: 16px;
+    }
+
     .login {
         width: 480px;
         height: 516px;
