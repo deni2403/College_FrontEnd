@@ -1,6 +1,8 @@
 # frontend-vue
 
-This template should help get you started developing with Vue 3 in Vite.
+Test Login :
+username : deni2403
+password : password
 
 ## Recommended IDE Setup
 
